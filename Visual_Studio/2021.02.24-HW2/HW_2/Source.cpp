@@ -19,60 +19,90 @@ T1 mult(T1 a, T2 b)
 {
 	return a * b;
 }
+
 template <typename T1, typename T2>
 T1 div(T1 a, T2 b)
 {
 	return a / b;
 }
 
-template <typename T1, typename T2>
+template<typename T1, typename T2>
 T1 mod(T1 a, T2 b)
 {
-	return a % b;
+	while (a > b) a -= b;
+	return a;
 }
 
 int operationIndex(char operation)
 {
-	int index = -2;
-	operation == '+' ? index = 0 : operation == '-' ? index = 1 : operation == '*' ? index = 2 : operation == '/' ? index = 3 : operation == '%' ? index = 4 : index = -1;
-	return index;
+	switch (operation)
+	{
+		case '+': return 0;
+		case '-': return 1;
+		case '*': return 2;
+		case '/': return 3;
+		case '%': return 4;
+	}
+	return 0;
 }
 
 template <typename T1, typename T2>
 T1 calculate(T1 a, T2 b, char operation)
 {
 	T1(*ops[5])(T1, T2) = { sum, diff, mult, div, mod };
+	return ops[operationIndex(operation)](a, b);
 }
 
+bool isInt(string str)
+{
+	return str.find('.') == -1;
+}
+
+bool isDouble(string str)
+{
+	return str.find('.') != -1;
+}
 
 int main(int argc, char** argv)
 {
-	string oper1 = "--operand1" ;
-	string operation = "--operator";
-	string oper2 = "--operand2";
+	string oper1;
+	string operation;
+	string oper2;
 	
-	string arguments[3] = { oper1, operation, oper2 };
-	for (int i = 0; i < argc; ++i)
+	if (strcmp(argv[1], "--operator") == 0) 
 	{
-		if (arguments[0] == argv[i])
+		operation = argv[2]; oper1 = argv[4]; oper2 = argv[6];
+	}
+	if (strcmp(argv[3], "--operator") == 0)
+	{
+		operation = argv[4]; oper1 = argv[2]; oper2 = argv[6];
+	}
+	if (strcmp(argv[5], "--operator") == 0)
+	{
+		operation = argv[6]; oper1 = argv[4]; oper2 = argv[2];
+	}
+	cout << oper1 << " ";
+	cout << operation << " ";
+	cout << oper2 << " = ";
+	if (isInt(oper1) && isInt(oper2))
+	{
+		cout << calculate(stoi(oper1), stoi(oper2), operation[0]) << endl;
+	}
+	else if (isDouble(oper1) && isDouble(oper2))
+	{
+		cout << calculate(stod(oper1), stod(oper2), operation[0]) << endl;
+	}
+	else
+	{
+		if (isInt(oper1))
 		{
-			++i;
-			arguments[0] = argv[i];
+			cout << calculate(stoi(oper1), stod(oper2), operation[0]) << endl;
 		}
-		else if (arguments[1] == argv[i])
+		else
 		{
-			++i;
-			arguments[1] = argv[i];
-		}
-		else if (arguments[2] == argv[i])
-		{
-			++i;
-			arguments[2] = argv[i];
+			cout << calculate(stod(oper1), stoi(oper2), operation[0]) << endl;
 		}
 	}
-	double a = stod(arguments[0]);
-	double b = stod(arguments[2]);
-	cout << arguments[0] << " " << arguments[1] << " " << arguments[2] << " = " << calculate(a, b, operationIndex(arguments[1])) << endl;
-	//cout << calculate(4.0f, 125, '/');
+
 	return EXIT_SUCCESS;
 }
